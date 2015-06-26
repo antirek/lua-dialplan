@@ -1,4 +1,16 @@
 
+local redis = require 'redis'
+
+local host = "127.0.0.1"
+local port = 6379
+
+client = redis.connect(host, port)
+
+
+--my = client.get('mykey')
+my = 'hello'
+my = client:get('mykey')
+
 function inner()
 	return {
 		["1200"] = inner_call("1200");
@@ -10,7 +22,7 @@ end;
 
 local conf = {
 	["1200"] = "SIP/1234";
-	["1300"] = "SIP/3333";
+	["1300"] = "SIP/4444";
 };
 
 
@@ -26,7 +38,8 @@ end;
 function inner_call(e)
 	return function ()
 		app.playback('beep')
-		app.noop(e)
+		app.dial(e)
+		app.noop('value ' .. my)
 		app.hangup()
 	end;
 end;
