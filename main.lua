@@ -5,30 +5,11 @@ local host = "127.0.0.1"
 local port = 6379
 
 client = redis.connect(host, port)
+peers = client:hgetall('peer')
 
-
---my = client.get('mykey')
-my = 'hello'
-my = client:get('mykey')
-
-function inner()
-	return {
-		["1200"] = inner_call("1200");
-		["1300"] = inner_call("1300");
-		["1400"] = inner_call("1400");
-	}
-end;
-
-
-local conf = {
-	["1200"] = "SIP/1234";
-	["1300"] = "SIP/4444";
-};
-
-
-function inner2(t)
+function inner(t)
 	local v = {}
-	for key, value in pairs(t) do
+	for key, value in pairs(peers) do
     	v[key] = inner_call(value);
 	end;
 	return v
@@ -37,9 +18,9 @@ end;
 
 function inner_call(e)
 	return function ()
-		app.playback('beep')
+		--app.playback('beep')
 		app.dial(e)
-		app.noop('value ' .. my)
+		app.noop('value')
 		app.hangup()
 	end;
 end;
@@ -47,15 +28,16 @@ end;
 
 local D = {
 	extensions = {
-		["maga"] = inner2(conf);
+		["maga"] = {
+			include = {'inner', 'outbound'}
+		};
+		["inner"] =inner(conf);
 	};
 
 	hints = {
 
 	};
 };
-
-
 
 
 Dialplan = {
