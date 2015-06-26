@@ -14,7 +14,8 @@ TRUNK = "DAHDI/G2"
 TRUNKMSD = 1
 -- TRUNK = "IAX2/user:pass@provider"
 
-dofile('/etc/asterisk/lua_scripts/main.lua')
+--dofile('/etc/asterisk/lua_scripts/main.lua')
+dofile('/home/sergey/Projects/lua-dialplan/main.lua')
 
 --
 -- Extensions are expected to be defined in a global table named 'extensions'.
