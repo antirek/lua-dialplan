@@ -54,3 +54,14 @@ also http://stackoverflow.com/questions/9794049/installing-luamongo-on-ubuntu-11
 or?
 
 luarocks 
+
+
+## Files 
+
+http://www.tutorialspoint.com/lua/lua_file_io.htm
+
+
+
+## cool sample 
+
+https://gist.github.com/igmar/4066527
