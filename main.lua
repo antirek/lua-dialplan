@@ -1,26 +1,21 @@
 
-local redis = require 'redis'
+local mongo = require 'mongo'
+local db = mongo.Connection.New()
+db:connect('localhost')
 
-local host = "127.0.0.1"
-local port = 6379
+file = io.open("/tmp/test.lua.log", "a+")
+io.output(file)
 
-client = redis.connect(host, port)
-peers = client:hgetall('peer')
-
-function inner(t)
-	local v = {}
-	for key, value in pairs(peers) do
-    	v[key] = inner_call(value);
-	end;
-	return v
-end;
-
-
-function inner_call(e)
-	return function ()
-		--app.playback('beep')
-		app.dial(e)
-		app.noop('value')
+function inner_call()
+	return function (context, extension)
+		local c1 = db:count('test.values')
+		io.write('count')
+		io.write(c1)
+		
+		app.playback('beep')
+		app.dial('SIP/'..extension)
+		app.noop(context)
+		app.noop(extension)
 		app.hangup()
 	end;
 end;
@@ -29,16 +24,18 @@ end;
 local D = {
 	extensions = {
 		["maga"] = {
-			include = {'inner', 'outbound'}
+			include = {'inner', 'outbound'};
 		};
-		["inner"] = inner(conf);
+		
+		["inner"] = {
+			["_XXX"] = inner_call()
+		};
 	};
 
 	hints = {
 
 	};
 };
-
 
 Dialplan = {
 	getExtensions = function ()
