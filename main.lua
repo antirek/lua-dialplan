@@ -31,7 +31,7 @@ local D = {
 		["maga"] = {
 			include = {'inner', 'outbound'}
 		};
-		["inner"] =inner(conf);
+		["inner"] = inner(conf);
 	};
 
 	hints = {

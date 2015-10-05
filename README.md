@@ -41,3 +41,16 @@ Lua 5.3.0 Copyright (C) 1994-2015 Lua.org, PUC-Rio
 
 `````
 
+
+
+
+##Mongo
+
+
+clone from https://github.com/moai/luamongo
+
+also http://stackoverflow.com/questions/9794049/installing-luamongo-on-ubuntu-11-10
+
+or?
+
+luarocks 
