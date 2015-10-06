@@ -5,7 +5,9 @@ db:connect('localhost')
 
 local inspect = require 'inspect'
 
-file = io.open("/tmp/test.lua.log", "a+")
+local config = require('/home/sergey/Projects/lua-dialplan/config');
+
+file = io.open("/tmp/q.txt", "a+")
 io.output(file)
 
 
@@ -24,34 +26,20 @@ function inner_call (context, extension)
 
 	app.noop("peer:"..settings.peer.vpbxId)
 	
-	local q2 = db:query("test.values", { vpbxId = settings.peer.vpbxId, peername = extension}):results();
+	local q2 = db:query("test.values", {
+		vpbxId = settings.peer.vpbxId, 
+		peername = extension
+	}):results();
+	
 	settings["peers"] = q2
 	local target = settings.peers{1}.peername
 	app.noop('target'..target)
 	
-
-	if (target ~= '') then
-		--app.playback('beep')
+	if (target ~= '') then	
 		app.dial('SIP/'..target)
 	else 
 		app.hangup()
 	end;
-
---[[ 
-	app.noop("channel = "..peername)
-	app.noop("callerid name = "..name)
-	app.noop("callerid num = "..num)
-	app.noop("callerid all = "..all)
-	app.noop("callerid vpbxId = "..settings.peer.vpbxId)
-	app.noop("callerid vpbx size = "..settings.peers)
-	
-	app.playback('beep')
-	app.dial('SIP/'..extension)
-	app.noop(context)
-	app.noop(extension)
-	app.hangup()
-
-	]]
 
 end;
 
@@ -63,7 +51,7 @@ local D = {
 		};
 
 		["ivr"] = {
-			["_XXX"] = ivr
+			["_XXX"] = ivr;
 		};
 		
 		["inner"] = {
@@ -72,7 +60,12 @@ local D = {
 		};
 
 		["outbound"] = {
-			
+			["112"] = emergency;
+			["_8XXXXXXXXXX"] = outbound;
+		};
+
+		["incoming"] = {
+			["_XXXXXXXXXX"] = incoming;
 		};
 	};
 
@@ -90,3 +83,6 @@ Dialplan = {
 		return D.hints
 	end;
 };
+
+
+return Dialplan;

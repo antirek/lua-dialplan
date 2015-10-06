@@ -56,12 +56,28 @@ or?
 luarocks 
 
 
-## Files 
+## Files write/read
 
 http://www.tutorialspoint.com/lua/lua_file_io.htm
+
+
+## File system
+
+luarocks install luafilesystem
+
 
 
 
 ## cool sample 
 
 https://gist.github.com/igmar/4066527
+
+
+
+
+
+## Requirements
+
+luafilesystem
+
+luamongo
