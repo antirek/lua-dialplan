@@ -1,26 +1,35 @@
 
+local config = require('dialplan.config');
 local mongo = require('mongo');
 local inspect = require('inspect');
 
 local db = mongo.Connection.New();
-db:connect('localhost');
+db:connect(config.db.host);
 
 function getVpbxIdByPeername (peername)
-    local q = db:query("test.peers", {peername = peername}):results();  
-    local vpbxId = q{1}.vpbxId;
+    local cursor = db:query("test.peers", {peername = peername});
+    local item = cursor:next();
+    local vpbxId;
+    if (item) then
+        vpbxId = item.vpbxId;
+    end;
     
     app.noop("vpbxId: "..vpbxId);
     return vpbxId;
 end;
 
 function findTargetByExtensionAndVpbxId (extension, vpbxId)
-    local q = db:query("test.extensions", {
+    local cursor = db:query("test.extensions", {
         vpbxId = vpbxId, 
         extension = extension
-    }):results();
-    local target = q{1}.target;
+    });
+    local item = cursor:next();
+    local target;
     
-    app.noop("target: "..inspect(target));
+    if (item) then
+        target = item.target;
+        app.noop("target: "..inspect(target));
+    end;
     return target;
 end;
 
