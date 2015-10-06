@@ -10,17 +10,17 @@ function inner_call (context, extension)
     app.noop("extension: "..extension)
 
     local vpbxId = dbHelper.getVpbxIdByPeername(peername);
-    local target = dbHelper.findTargetByExtensionAndVpbxId(extension, vpbxId);    
+    local target = dbHelper.findTargetByExtensionAndVpbxId(extension, vpbxId);
     
     if (target) then  
-        app.dial(target["value"], 3);
+        app.dial(target["value"], 10);
 
         local dialstatus = channel["DIALSTATUS"]:get();
 
         app.noop("dialstatus: "..dialstatus);
 
     else 
-        app.hangup(1);
+        app.hangup(34);
     end;
     app.hangup();
 end;
@@ -28,8 +28,7 @@ end;
 function hangupHandler (context, extension)
     app.noop('hangup handle');
     app.noop(context);
-end
-
+end;
 
 local Dialplan = {
     getExtensions = function ()

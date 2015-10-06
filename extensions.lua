@@ -3,5 +3,5 @@
 -- copy extensions.lua in /etc/asterisk or create symlink
 ]]
 
-local Dialplan = require('/home/sergey/Projects/lua-dialplan/main');
+local Dialplan = require('dialplan.main');
 extensions = Dialplan.getExtensions();
