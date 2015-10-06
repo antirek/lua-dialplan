@@ -58,16 +58,21 @@ end;
 
 local D = {
 	extensions = {
-		["maga"] = {
-			include = {'inner', 'outbound2'};			
+		["internal"] = {
+			include = {"inner", "outbound"};			
+		};
+
+		["ivr"] = {
+			["_XXX"] = ivr
 		};
 		
 		["inner"] = {
-			["_XXX"] = inner_call
+			["_XXX"] = inner_call;
+			["_XXXX"] = inner_call;
 		};
 
-		["outbound2"] = {
-			['_XXXX'] = inner_call
+		["outbound"] = {
+			
 		};
 	};
 
