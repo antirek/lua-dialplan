@@ -1,42 +1,52 @@
 
 local mongo = require 'mongo'
-local db = mongo.Connection.New()
-db:connect('localhost')
-
 local inspect = require 'inspect'
 
 local config = require('/home/sergey/Projects/lua-dialplan/config');
 
+
+local db = mongo.Connection.New()
+db:connect('localhost')
 file = io.open("/tmp/q.txt", "a+")
 io.output(file)
 
 
-function inner_call (context, extension)
-	
-	peername = channel.CHANNEL("peername"):get()
-	name = channel.CALLERID("name"):get()
-	num = channel.CALLERID("num"):get()
-	all = channel.CALLERID("all"):get()
-	app.noop("extension "..extension)
-
-	local q1 = db:query("test.values", {peername = peername}):results();
+function getVpbxIdByPeername (peername)
+	local q1 = db:query("test.peers", {peername = peername}):results();
 	local settings = {
 		["peer"] = q1{1};
 	};
 
-	app.noop("peer:"..settings.peer.vpbxId)
-	
-	local q2 = db:query("test.values", {
-		vpbxId = settings.peer.vpbxId, 
-		peername = extension
+	app.noop("vpbxId: "..settings.peer.vpbxId)
+	return settings.peer.vpbxId;
+end;
+
+function findTargetByExtensionAndVpbxId (extension, vpbxId)
+	local q2 = db:query("test.extensions", {
+		vpbxId = vpbxId, 
+		extension = extension
 	}):results();
 	
-	settings["peers"] = q2
-	local target = settings.peers{1}.peername
-	app.noop('target'..target)
+	local settings = {
+		["peers"] = q2;
+	}
+	return settings.peers{1}.target;
+end;
+
+function inner_call (context, extension)
+	peername = channel.CHANNEL("peername"):get()
+	name = channel.CALLERID("name"):get()
+	num = channel.CALLERID("num"):get()
+	all = channel.CALLERID("all"):get()
+	app.noop("extension: "..extension)
+
+	local vpbxId = getVpbxIdByPeername(peername);
+	local target = findTargetByExtensionAndVpbxId(extension, vpbxId);
+
+	app.noop('target: '..target["value"])
 	
 	if (target ~= '') then	
-		app.dial('SIP/'..target)
+		app.dial(target["value"])
 	else 
 		app.hangup()
 	end;
@@ -44,45 +54,38 @@ function inner_call (context, extension)
 end;
 
 
-local D = {
-	extensions = {
-		["internal"] = {
-			include = {"inner", "outbound"};			
+local Dialplan = {
+	getExtensions = function () 
+		return {
+			["internal"] = {
+				include = {"inner", "outbound"};
+			};
+
+			["ivr"] = {
+				["_XXX"] = ivr;
+			};
+			
+			["inner"] = {
+				["_XXX"] = inner_call;
+				["_XXXX"] = inner_call;
+			};
+
+			["outbound"] = {
+				["112"] = emergency;
+				["_8XXXXXXXXXX"] = outbound;
+			};
+
+			["incoming"] = {
+				["_XXXXXXXXXX"] = incoming;
+			};
 		};
-
-		["ivr"] = {
-			["_XXX"] = ivr;
-		};
-		
-		["inner"] = {
-			["_XXX"] = inner_call;
-			["_XXXX"] = inner_call;
-		};
-
-		["outbound"] = {
-			["112"] = emergency;
-			["_8XXXXXXXXXX"] = outbound;
-		};
-
-		["incoming"] = {
-			["_XXXXXXXXXX"] = incoming;
-		};
-	};
-
-	hints = {
-
-	};
-};
-
-Dialplan = {
-	getExtensions = function ()
-		return D.extensions
 	end;
 
 	getHints = function ()
-		return D.hints
+		return {
+
+		};
 	end;
 };
-
 
 return Dialplan;
