@@ -8,12 +8,11 @@ function inner_call (context, extension)
     num = channel.CALLERID("num"):get()
     all = channel.CALLERID("all"):get()
     app.noop("extension: "..extension)
-
-    local vpbxId = dbHelper.getVpbxIdByPeername(peername);
-    local target = dbHelper.findTargetByExtensionAndVpbxId(extension, vpbxId);
+    
+    local target = dbHelper.findTargetByExtension(extension);
     
     if (target) then  
-        app.dial(target["value"], 10);
+        app.dial(target, 10);
 
         local dialstatus = channel["DIALSTATUS"]:get();
 
@@ -34,11 +33,15 @@ local Dialplan = {
     getExtensions = function ()
         return {
             ["internal"] = {
-                include = {"inner", "outbound"};
+                include = {"inner", "outbound", "services"};
             };
 
             ["ivr"] = {
                 ["_XXX"] = ivr;
+            };
+
+            ["services"] = {
+                ["*10"] = alarm;
             };
             
             ["inner"] = {

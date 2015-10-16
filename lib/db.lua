@@ -6,22 +6,10 @@ local inspect = require('inspect');
 local db = mongo.Connection.New();
 db:connect(config.db.host);
 
-function getVpbxIdByPeername (peername)
-    local cursor = db:query("test.peers", {peername = peername});
-    local item = cursor:next();
-    local vpbxId;
-    if (item) then
-        vpbxId = item.vpbxId;
-    end;
-    
-    app.noop("vpbxId: "..vpbxId);
-    return vpbxId;
-end;
-
-function findTargetByExtensionAndVpbxId (extension, vpbxId)
-    local cursor = db:query("test.extensions", {
-        vpbxId = vpbxId, 
-        extension = extension
+function findTargetByExtension (extension)
+    app.noop('extension for find'..extension);
+    local cursor = db:query("viola.extensions", {        
+        name = extension
     });
     local item = cursor:next();
     local target;
@@ -34,8 +22,7 @@ function findTargetByExtensionAndVpbxId (extension, vpbxId)
 end;
 
 local d = {
-    ["getVpbxIdByPeername"] = getVpbxIdByPeername;
-    ["findTargetByExtensionAndVpbxId"] = findTargetByExtensionAndVpbxId; 
+    ["findTargetByExtension"] = findTargetByExtension; 
 }
 
 return d;
