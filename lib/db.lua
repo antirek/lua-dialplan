@@ -36,9 +36,28 @@ function findMobileByExtension (extension)
     return mobile;
 end;
 
+function checkRecord (peername)
+    local device = 'SIP/'..peername;
+    app.noop(device)
+    local cursor = db:query("viola.extensions", {
+        device = device
+    });
+    local item = cursor:next();
+    app.noop(item)
+    local record;
+    
+    if (item) then
+        record = item.record;
+    end;
+    
+    app.noop("record: "..record);
+    return record;
+end;
+
 local d = {
     ["findDeviceByExtension"] = findDeviceByExtension; 
     ["findMobileByExtension"] = findMobileByExtension;
+    ["checkRecord"] = checkRecord;
 };
 
 return d;
