@@ -2,31 +2,40 @@
 local config = require('dialplan.config');
 local dbHelper = require('dialplan.lib.db');
 
-function inner_call (context, extension)
+
+function info ()
     peername = channel.CHANNEL("peername"):get()
     name = channel.CALLERID("name"):get()
     num = channel.CALLERID("num"):get()
     all = channel.CALLERID("all"):get()
-    app.noop("extension: "..extension)
-    
-    local target = dbHelper.findTargetByExtension(extension);
+end
+
+function inner_call (target)
+    -- info();
     
     if (target) then  
-        app.dial(target, 10);
-
-        local dialstatus = channel["DIALSTATUS"]:get();
-
-        app.noop("dialstatus: "..dialstatus);
-
+        app.dial(target, 10);        
     else 
         app.hangup(34);
     end;
     app.hangup();
 end;
 
+function inner_call_device (context, extension) 
+    local device = dbHelper.findDeviceByExtension(extension);
+    inner_call(device);
+end;
+
+function inner_call_mobile (context, extension) 
+    local mobile = dbHelper.findMobileByExtension(extension);
+    inner_call(mobile);
+end
+
 function hangupHandler (context, extension)
     app.noop('hangup handle');
     app.noop(context);
+    local dialstatus = channel["DIALSTATUS"]:get();
+    app.noop("dialstatus: "..dialstatus);
 end;
 
 local Dialplan = {
@@ -44,9 +53,9 @@ local Dialplan = {
                 ["*10"] = alarm;
             };
             
-            ["inner"] = {
-                ["_XXX"] = inner_call;
-                ["_XXXX"] = inner_call;
+            ["inner"] = {                
+                ["_XXX."] = inner_call_device;
+                ["_*XXX."] = inner_call_mobile;
                 ["h"] = hangupHandler;
             };
 

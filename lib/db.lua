@@ -6,23 +6,39 @@ local inspect = require('inspect');
 local db = mongo.Connection.New();
 db:connect(config.db.host);
 
-function findTargetByExtension (extension)
+function findDeviceByExtension (extension)
     app.noop('extension for find'..extension);
     local cursor = db:query("viola.extensions", {        
-        name = extension
+        extension = extension
     });
     local item = cursor:next();
-    local target;
+    local device;
     
     if (item) then
-        target = item.target;
-        app.noop("target: "..inspect(target));
+        device = item.device;
+        app.noop("device: "..inspect(device));
     end;
-    return target;
+    return device;
+end;
+
+function findMobileByExtension (extension)
+    app.noop('extension for find: '..extension);
+    local cursor = db:query("viola.extensions", {        
+        extension = string.sub(extension, 2);
+    });
+    local item = cursor:next();
+    local mobile;
+    
+    if (item) then
+        mobile = item.mobile;
+        app.noop("mobile: "..inspect(mobile));
+    end;
+    return mobile;
 end;
 
 local d = {
-    ["findTargetByExtension"] = findTargetByExtension; 
-}
+    ["findDeviceByExtension"] = findDeviceByExtension; 
+    ["findMobileByExtension"] = findMobileByExtension;
+};
 
 return d;
