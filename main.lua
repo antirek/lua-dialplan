@@ -21,21 +21,21 @@ function inner_call (target)
 end;
 
 function checkRecord ()
-
-    local date = os.date();
+    local date = os.date("*t");
     local peername = channel.CHANNEL("peername"):get();
-    app.noop('peername: '..peername);
+    app.noop('peername: '..peername);    
 
-    local record = dbHelper.checkRecord(peername);
+    local recordCalled = dbHelper.checkRecord(peername);
+    local unique = channel.UNIQUEID:get();
 
-    if (record == 'yes') then
-        local fname = string.format("%s-%s%s%s", v1, date.day, date.month, date.year)
-        WAV = "/tmp/wav/"
-        MP3 = string.format("/records/%s/%s/%s/", date.year, date.month, date.day)
-        local monopt = string.format("/bin/nice -n 19 /usr/bin/lame -b 16 --silent %s%s.wav %s%s.mp3 && rm -f %s%s.wav",WAV,fname,MP3,fname,WAV,fname)
-        app.mixmonitor(string.format("%s%s.wav,b,%s",WAV,fname,monopt))
+    if (recordCalled == 'yes') then
+        local fname = string.format("%s-%s%s%s", unique, date.day, date.month, date.year);
+        WAV = "/tmp/wav/";
+        MP3 = string.format("/tmp/records/%s/%s/%s/", date.year, date.month, date.day);
+        local options = string.format("/usr/bin/nice -n 19 /usr/bin/lame -b 16 --silent %s%s.wav %s%s.mp3 && rm -f %s%s.wav", WAV, fname, MP3, fname, WAV, fname);
+        app.mixmonitor(string.format("%s%s.wav,b,%s", WAV, fname, options));
 
-        channel["CDR(recordingfile)"]:set(fname..".mp3")
+        channel["CDR(recordingfile)"]:set(fname..".mp3");
     end;
     return;
 end;
@@ -57,15 +57,35 @@ function hangupHandler (context, extension)
     app.noop("dialstatus: "..dialstatus);
 end;
 
+function ivr (context, extension)
+    local menu = dbHelper.findIVRbyExtension(extension);
+    app.read('CHOICE', menu.filename);
+    local choice = channel['CHOICE']:get();
+    app.noop('choice: '..choice);
+    if (choice) then
+        local i = 1
+        while menu.choices[i] do
+          --app.noop(menu.choices[i].key)
+          if (menu.choices[i].key == choice) then 
+            break
+          end;
+          i = i + 1
+        end;
+        local action = menu.choices[i].action;
+        app.noop('action: '..action);
+        app["goto"](action);
+    end;
+end;
+
 local Dialplan = {
     getExtensions = function ()
         return {
             ["internal"] = {
-                include = {"inner", "outbound", "services"};
+                include = {"ivr", "inner", "outbound", "services"};
             };
 
             ["ivr"] = {
-                ["_XXX"] = ivr;
+                ["200"] = ivr;
             };
 
             ["services"] = {
