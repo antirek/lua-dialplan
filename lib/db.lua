@@ -36,6 +36,24 @@ function findMobileByExtension (extension)
     return mobile;
 end;
 
+function checkRecord (peername)
+    local device = 'SIP/'..peername;
+    app.noop(device)
+    local cursor = db:query("viola.extensions", {
+        device = device
+    });
+    local item = cursor:next();
+    app.noop(item)
+    local record;
+    
+    if (item) then
+        record = item.record;
+    end;
+    
+    app.noop("record: "..record);
+    return record;
+end;
+
 function findIVRByExtension (extension)
     app.noop('extension for find in ivr: '..extension);
     local cursor = db:query("viola.ivr", {        
@@ -61,27 +79,9 @@ function findQueueByExtension (extension)
     
     if (item) then
         queue = item;
-        app.noop("ivr queue: "..inspect(queue));
+        app.noop("queue: "..inspect(queue));
     end;
     return queue;
-end;
-
-function checkRecord (peername)
-    local device = 'SIP/'..peername;
-    app.noop(device)
-    local cursor = db:query("viola.extensions", {
-        device = device
-    });
-    local item = cursor:next();
-    app.noop(item)
-    local record;
-    
-    if (item) then
-        record = item.record;
-    end;
-    
-    app.noop("record: "..record);
-    return record;
 end;
 
 local d = {

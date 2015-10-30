@@ -23,7 +23,7 @@ end;
 function checkRecord ()
     local date = os.date("*t");
     local peername = channel.CHANNEL("peername"):get();
-    app.noop('peername: '..peername);    
+    app.noop('peername: '..peername);
 
     local recordCalled = dbHelper.checkRecord(peername);
     local unique = channel.UNIQUEID:get();
@@ -83,7 +83,7 @@ function queues (context, extension)
     local queue = dbHelper.findQueueByExtension(extension);
     app.noop('queue:'..queue.name);
     app.queue(queue.name);
-end
+end;
 
 local Dialplan = {
     getExtensions = function ()
