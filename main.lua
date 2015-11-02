@@ -7,6 +7,7 @@ local inner = require('dialplan.lib.inner')(dbHelper);
 local ivr = require('dialplan.lib.ivr')(dbHelper);
 local queue = require('dialplan.lib.queue')(dbHelper);
 
+
 function info ()
     peername = channel.CHANNEL("peername"):get();
     name = channel.CALLERID("name"):get();
@@ -19,6 +20,7 @@ function hangupHandler (context, extension)
     app.noop(context);
     local dialstatus = channel["DIALSTATUS"]:get();
     app.noop("dialstatus: "..dialstatus);
+    app['return']();
 end;
 
 local Dialplan = {
@@ -46,6 +48,10 @@ local Dialplan = {
                 ["_XXXX"] = inner.call_device;
                 ["_*XXXX"] = inner.call_mobile;
                 ["h"] = hangupHandler;
+            };
+
+            ["hangups"] = {
+                ["s"] = hangupHandler;
             };
 
             ["outbound"] = {
