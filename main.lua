@@ -1,5 +1,7 @@
 local config = require('dialplan.config');
-local dbHelper = require('dialplan.lib.db');
+local db = require('dialplan.lib.db');
+
+local dbHelper = db(config);
 
 function info ()
     peername = channel.CHANNEL("peername"):get();
