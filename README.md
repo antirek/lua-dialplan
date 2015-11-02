@@ -81,3 +81,8 @@ https://gist.github.com/igmar/4066527
 luafilesystem
 
 luamongo
+
+
+@todo: docker image with lua env
+
+
