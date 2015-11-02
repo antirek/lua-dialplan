@@ -1,5 +1,6 @@
 local config = require('dialplan.config');
 local db = require('dialplan.lib.db');
+local inspect = require('inspect');
 
 local dbHelper = db(config);
 
@@ -23,12 +24,36 @@ function hangupHandler (context, extension)
     app['return']();
 end;
 
+function incoming (c, e, rule)
+    --app.goto('queues,1200,1');
+    app.noop('halo'..c..e..inspect(rule));
+    if (rule.target) then 
+        app['goto'](rule.target);
+    else 
+        app.hangup();
+    end;
+end;
+
+function getIncomingExtensions ()
+    local extensions = dbHelper.getIncomingExtensions();
+
+    local q = {};
+    for key, rule in pairs(extensions) do
+        q[key] = function (context, extension)
+            incoming(context, extension, rule);
+        end;
+    end;
+    return q;
+end;
+
 local Dialplan = {
     getExtensions = function ()
         return {
-            ["internal"] = {
-                include = {"ivr", "inner", "outbound", "services"};
+            ["internal"] = getIncomingExtensions();
+            --[[{
+                --include = {"ivr", "inner", "outbound", "services"};
             };
+            ]]
 
             ["ivr"] = {
                 ["_XXX"] = ivr.menu;

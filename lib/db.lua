@@ -2,9 +2,20 @@ local mongo = require('mongo');
 local inspect = require('inspect');
 
 function db (config)
-
+    
     local db = mongo.Connection.New();
     db:connect(config.db.host);
+    
+    function getIncomingExtensions ()
+        local query = db:query("viola.incoming");
+        local exts = {};
+        
+        for result in query:results() do
+            exts[result.extension] = result;
+        end;
+        
+        return exts;
+    end;
 
     function findDeviceByExtension (extension)
         app.noop('extension for find'..extension);
@@ -90,6 +101,7 @@ function db (config)
         ["checkRecord"] = checkRecord;
         ["findIVRByExtension"] = findIVRByExtension;
         ["findQueueByExtension"] = findQueueByExtension;
+        ["getIncomingExtensions"] = getIncomingExtensions;
     };
 
 end;
