@@ -5,7 +5,7 @@ function ivr (dbHelper)
         local menu = dbHelper.findIVRByExtension(extension);
         app.answer();
         app.set("CHANNEL(hangup_handler_push)=hangups,s,1");
-        app.read('CHOICE', menu.filename);
+        app.read('CHOICE', menu.filename, menu.maxdigits, menu.options, menu.attempts, menu.timeout);
         local choice = channel['CHOICE']:get();
         app.noop('choice: '..choice);
         if (choice) then

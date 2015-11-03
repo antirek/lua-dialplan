@@ -49,12 +49,10 @@ end;
 local Dialplan = {
     getExtensions = function ()
         return {
-            ["internal"] = getIncomingExtensions();
-            --[[{
-                --include = {"ivr", "inner", "outbound", "services"};
+            ["internal"] = {
+                include = {"ivr", "inner", "outbound", "services"};
             };
-            ]]
-
+            
             ["ivr"] = {
                 ["_XXX"] = ivr.menu;
             };
@@ -72,7 +70,7 @@ local Dialplan = {
                 ["_*XXX"] = inner.call_mobile;
                 ["_XXXX"] = inner.call_device;
                 ["_*XXXX"] = inner.call_mobile;
-                ["h"] = hangupHandler;
+                --["h"] = hangupHandler;
             };
 
             ["hangups"] = {
@@ -84,9 +82,7 @@ local Dialplan = {
                 ["_8XXXXXXXXXX"] = outbound;
             };
 
-            ["incoming"] = {
-                ["_XXXXXXXXXX"] = incoming;
-            };
+            ["incoming"] = getIncomingExtensions();
         };
     end;
 
