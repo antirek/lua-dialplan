@@ -80,6 +80,22 @@ function db (config)
         return menu;
     end;
 
+    function findTimeByExtension(extension)
+        app.noop("time"..extension);
+        local cursor = db:query("viola.times", {
+            extension = extension
+        });
+
+        local item = cursor:next();
+        local time;
+
+        if (item) then
+            time = item;
+            app.noop("time: "..inspect(time));
+        end;
+        return time;
+    end;
+
     function findQueueByExtension (extension)
         app.noop('extension for find in queue: '..extension);
         local cursor = db:query("viola.queue", {
@@ -102,6 +118,7 @@ function db (config)
         ["findIVRByExtension"] = findIVRByExtension;
         ["findQueueByExtension"] = findQueueByExtension;
         ["getIncomingExtensions"] = getIncomingExtensions;
+        ["findTimeByExtension"] = findTimeByExtension;
     };
 
 end;

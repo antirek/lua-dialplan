@@ -7,6 +7,8 @@ local dbHelper = db(config);
 local inner = require('dialplan.lib.inner')(dbHelper);
 local ivr = require('dialplan.lib.ivr')(dbHelper);
 local queue = require('dialplan.lib.queue')(dbHelper);
+local time = require('dialplan.lib.time')(dbHelper);
+local services = require('dialplan.lib.services')(dbHelper);
 
 
 function info ()
@@ -26,7 +28,7 @@ end;
 
 function incoming (c, e, rule)
     --app.goto('queues,1200,1');
-    app.noop('halo'..c..e..inspect(rule));
+    app.noop('incoming'..c..e..inspect(rule));
     if (rule.target) then 
         app['goto'](rule.target);
     else 
@@ -57,8 +59,12 @@ local Dialplan = {
                 ["_XXX"] = ivr.menu;
             };
 
+            ["time"] = {
+                ["_XXXX"] = time.time;
+            };
+
             ["services"] = {
-                ["*10"] = alarm;
+                ["*10"] = services.sayunixtime;
             };
 
             ["queues"] = {
